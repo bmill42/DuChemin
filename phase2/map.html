@@ -1,0 +1,75 @@
+<html>
+<head>
+	<title>Network Analysis</title>
+</head>
+
+<link rel="stylesheet" href="static/css/main.css" />
+
+<body>
+<div class="heading">
+DuChemin Map<br>
+</div>
+<div id="networkGraph"><div id="loadingWheel">Loading...</div></div>
+<div class="heading">Results</div>
+
+<div class="content">
+<p>
+The map visualization allowed us to explore data in the format it is most logically displayed as; specifically, each connected graph in the image above is a single musical "piece" detailing in musical order the "phrases" for which we have "cadence" data. This "cadence" data details the "shape" of the musical phrase and is one of the most interesting aspects to the Domain Experts. Since showing all 10,000 nodes and the ensuing edges would have been remarkably slow -- and since simplifying/summarizing the graph would not lend well to analysis of specific nodes -- any data for which no cadence information was available were ignored; this left around 2000 nodes remaining to be distributed throughout the various pieces.
+
+<p>
+The final tone and cadence information that came before and after each phrase was then added as fields for each phrase. Thus, searches could easily use "relative" information and there were more options by which we could gauge "similar" pieces. Many columns that were of no interest to us (or that didn't truly indicate "similar" pieces) were removed.
+
+<p>
+In terms of results, this piece map revealed that a majority of the data for pieces was actually missing cadence information and that the "effective structure" of the pieces ranged from simple linear graphs to more complex many-edged constructs. More specifically, parallel phrases were revealed -- which makes sense in regard to the data since up to 4 voices could be active at any time. Regardless, most of the data appeared to be dominantly linear; in fact, most of the pieces were a series of one phrase active at a time with some breaks where two voices played at the same time. 
+
+<p>
+Ideally, being able to see the "common shape" of the music will be influential in deciding what shapes the missing pieces should have -- and thus also in determining what the missing "phrases" are. I leave deeper analysis to the Domain Experts and am happy to have been able to experiment and play with this data. And to the DuChemin data I bid an appreciative thanks and goodbye.
+
+<p>
+Fare thee well! And if for ever,<br/>
+Still for ever, fare thee well.<br/>
+
+</div>
+
+</body>
+<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+<script>
+//Global Variable Setup.
+var dataFile =  "data/duchemin.production.csv";
+var adjacencyFile =  "data/duchemin.map.json";
+var maxRadius = 15; //The largest radius allowed for the most important node.
+var minRadius = 5; //The smallest radius allowed for any given node.
+var hoverScale = 2; //The percentage to "grow" a node when hovered over.
+var linkDistance = 40;
+var numGraphIterations = 120;
+var graphGravity = 0.005;
+var graphCharge = -40;
+
+//The fields to display on the graph:
+var tooltips = [["piece","Piece"], 
+		["start_measure", "Start Measure"], 
+		["stop_measure","Stop Measure"],
+		["phrase_length","Phrase Length"],
+		["cadence_kind_before","Cadence Before"],
+		["cadence_kind_after","Cadence After"],
+		["cadence_kind","Cadence"],
+		["cadence_final_tone_before","Final Tone Before"],
+		["cadence_final_tone_after","Final Tone After"],
+		["cadence_final_tone","Final Tone"]
+		];
+</script>
+
+<script src="static/js/d3.min.js"></script>
+<script src="static/js/pagerank.js"></script>
+<script src="static/js/uiFeatures.js"></script>
+<script src="static/js/filters.js"></script>
+
+<script>
+//Some final Global Variable Setup.
+var clickFilter = filterPieces;
+
+</script>
+
+<script src="static/js/main.js"></script>
+
+</html>

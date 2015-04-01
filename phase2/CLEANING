@@ -1,0 +1,35 @@
+#The commands used to clean the data are found below:
+
+from manage import *
+
+keep_specified_cols(["cadence_kind", "cadence_final_tone","composition_number", "voices_p6_up", "start_measure", "stop_measure", "voice_role_lo1_nim", "voices_p6_lo"],"data/duchemin_raw.csv","data/duchemin.feature_selected2.csv")
+
+
+purge_rows_with_col_entry("cadence_kind", "data/duchemin.feature_selected2.csv", "data/duchemin.feature_selected2.with_cadences.csv", val="")
+
+#Make all empty columns standardized as "None".
+fill_empty_col("voice_role_lo1_nim", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", val="None")
+
+fill_empty_col("voices_p6_lo", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", val="None") 
+
+fill_empty_col("voices_p6_up", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", val="None") 
+
+fill_empty_col("cadence_final_tone", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", val="None")
+
+fill_empty_col("cadence_kind", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.csv", val="None") 
+
+
+remove_duplicates("data/duchemin.feature_selected2.with_cadences.nonempty.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.csv")
+
+make_field_map("data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.csv", "cadence_kind")
+
+make_field_map("data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.csv", "cadence_final_tone")
+
+add_phrase_length("data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.measured.csv")
+
+switch_cols("data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.csv", "data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.measured.rearranged.csv",0,1)
+
+make_smart_piece_map("data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.measured.rearranged.csv", "data/duchemin.map.json")
+
+make_similarity_JSON("data/duchemin.feature_selected2.with_cadences.nonempty.deduplicated.mapped.measured.rearranged.csv", "data/duchemin.similarities.json")
+
