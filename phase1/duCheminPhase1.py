@@ -99,21 +99,21 @@ def add_final_cadence(csv_input, csv_output):
 	
 
 
-keep_specified_cols(["cadence_kind", "cadence_final_tone","composition_number", "phrase_number","cadence_alter","cadence_role_cantz","cadence_role_tenz","start_measure","stop_measure"],"duchemin_all_data_3_9_2015.csv","duchemin_feature_selected2-test.csv")
+keep_specified_cols(["cadence_kind", "cadence_final_tone","composition_number", "phrase_number","cadence_alter","cadence_role_cantz","cadence_role_tenz","start_measure","stop_measure"],"duchemin_all_data_3_9_2015.csv","duchemin_phase1.csv")
 
-purge_rows_with_col_entry("cadence_kind", "duchemin_feature_selected2-test.csv", "duchemin_feature_selected2-test.csv", val="None")
+purge_rows_with_col_entry("cadence_kind", "duchemin_phase1.csv", "duchemin_phase1.csv", val="None")
 
-purge_rows_with_col_entry("cadence_kind", "duchemin_feature_selected2-test.csv", "duchemin_feature_selected2-test.csv", val="NoCadence")
+purge_rows_with_col_entry("cadence_kind", "duchemin_phase1.csv", "duchemin_phase1.csv", val="NoCadence")
 
-remove_duplicates("duchemin_feature_selected2-test.csv", "duchemin_feature_selected2-test.csv")
+remove_duplicates("duchemin_phase1.csv", "duchemin_phase1.csv")
 
-make_field_map("duchemin_feature_selected2-test.csv", "duchemin_feature_selected_map.csv", "cadence_final_tone")
+make_field_map("duchemin_phase1.csv", "duchemin_phase1.csv", "cadence_final_tone")
 
-make_field_map("duchemin_feature_selected_map.csv", "duchemin_feature_selected_map.csv", "cadence_kind")
+make_field_map("duchemin_phase1.csv", "duchemin_phase1.csv", "cadence_kind")
 
-remove_cadence_conflicts_smart("duchemin_feature_selected_map.csv","duchemin_feature_selected_map_pruned.csv")
+remove_cadence_conflicts_smart("duchemin_phase1.csv","duchemin_phase1.csv")
 
-add_final_cadence("duchemin_feature_selected_map_pruned.csv","data/duchemin.production.csv")
+add_final_cadence("duchemin_phase1.csv","data/duchemin.production.csv")
 
 make_smart_piece_map("data/duchemin.production.csv", "data/duchemin.map.json")
 
