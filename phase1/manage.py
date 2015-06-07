@@ -2,10 +2,9 @@
 
 from scripts import *
 from operator import itemgetter
-# import sys
-# import random
 import json
 import csv
+import re
 
 
 def filter_R2s(filename, minimum=0, maximum=1, verbose=False):
@@ -185,10 +184,12 @@ def make_field_map(csv_input, csv_output, field):
                     break
 
                 # Set the "after" field of this entry.
-                data[row_id][-1].append(data[temp_row_id][index_of_interest])
+                if data[row_id][-1] == []:
+                	data[row_id][-1].append(data[temp_row_id][index_of_interest])
 
                 # Set the "before" field of the later entries.
-                data[temp_row_id][-2].append(data[row_id][index_of_interest])
+                if data[temp_row_id][-2] == []:
+                	data[temp_row_id][-2].append(data[row_id][index_of_interest])
 
     # Split the "list" entries by "+" to avoid issues reading the CSV.
     for row in data:
@@ -380,6 +381,100 @@ def make_smart_piece_map(csv_input, output_file):
         json.dump(adjacency_list, f)
         print ("File constructed successfully!")
 
+def remove_cadence_conflicts(csv_input, csv_output):
+	headers = get_headers(csv_input)
+	piece_index = headers.index("composition_number")
+	phrase_index = headers.index("phrase_number")
+	
+	data = get_data_list(csv_input)
+	new_data = []
+	seen_list = []
+	deleted = 0
+	
+	for i, row in enumerate(data):
+		piece = row[piece_index]
+		phrase = row[phrase_index]
+		if [piece, phrase] in seen_list:
+			deleted += 1
+		else:
+			seen_list.append([piece, phrase])
+			new_data.append(row)
+	
+	write_data(csv_output, headers, new_data)
+	print "File written successfully!"
+	print "Rows Deleted: {}".format(deleted)
+		
+def remove_cadence_conflicts_smart(csv_input, csv_output):
+	headers = get_headers(csv_input)
+	piece_index = headers.index("composition_number")
+	phrase_index = headers.index("phrase_number")
+	end_measure_index = headers.index("stop_measure")
+	
+	data = get_data_list(csv_input)
+	new_data = []
+	phrase_list = []
+	deleted = 0
+	
+	phrase_hi_meas = dict()
+	phrase_last_added_row = dict()
+	for row in data:
+		phrase = row[phrase_index]
+		if phrase in phrase_list:
+			if row[end_measure_index] > phrase_hi_meas[phrase]:
+				phrase_hi_meas[phrase] = row[end_measure_index]
+				new_data.remove(phrase_last_added_row[phrase])
+				deleted += 1
+				new_data.append(row)
+				phrase_last_added_row[phrase] = row
+			else:
+				deleted += 1
+		else:
+			phrase_list.append(phrase)
+			new_data.append(row)
+			phrase_hi_meas[phrase] = row[end_measure_index]	
+			phrase_last_added_row[phrase] = row
+	
+	write_data(csv_output, headers, new_data)
+	print "File written successfully!"
+	print "Rows Deleted: {}".format(deleted)
+	
+def add_final_cadence(csv_input, csv_output):
+	headers = get_headers(csv_input)
+	piece_index = headers.index("composition_number")
+	phrase_index = headers.index("phrase_number")
+	cadence_tone_index = headers.index("cadence_final_tone")
+	
+	headers += ["{}".format("final_cadence")]
+	
+	data = get_data_list(csv_input)
+	new_data = []
+	seen_list = []
+	pieces = dict() # values are piece identifiers and keys are highest phrase number so far
+
+	deleted = 0
+	
+	for i, row in enumerate(data):
+		piece = row[piece_index]
+		phrase = row[phrase_index]
+		cadence_tone = row[cadence_tone_index]
+		if piece in seen_list:
+			thisphrase = re.search('(DC[0-9]+\.)([0-9]+):.+',phrase)
+			phrase_number = int(thisphrase.group(2))
+			if phrase_number > pieces[piece]:
+				pieces[piece] = [phrase_number, cadence_tone]
+		else:
+			seen_list.append(piece)
+			thisphrase = re.search('(DC[0-9]+\.)([0-9]+):.+',phrase)
+			phrase_number = int(thisphrase.group(2))
+			pieces[piece] = [phrase_number, cadence_tone]
+	
+	for row in data:
+		piece = row[piece_index]
+		new_row = row + [pieces[piece][1]]
+		new_data.append(new_row)
+	
+	write_data(csv_output, headers, new_data)
+	print "File written successfully!"
 
 def remove_duplicates(csv_input, csv_output):
     # Variable Setup.
