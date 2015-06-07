@@ -209,10 +209,10 @@ def make_field_map(csv_input, csv_output, field):
 def rows_similar(row1, row2, headers):
 	# Variable Setup.
 	lenIndex = headers.index("piece_length")
-	threshhold = int(len(headers) * 0.6)  # Number of entries that must be similar.
+	threshhold = int(len(headers) * 0.75)  # Number of entries that must be similar.
 	num_matches = 0
-	# inverse of the ratio of this piece's length to the longest piece (hard-coded as 16)
-	lenWeight = 16 / float(row1[lenIndex])  
+	# inverse of the ratio of this piece's length to the longest piece (hard-coded as 11)
+	lenWeight = 11 / float(row1[lenIndex])  
 
 	for i in range(len(row1)):
 		for j in range(len(row2)):
@@ -491,11 +491,16 @@ def adjacent_cadences_by_piece(csv_input, csv_output):
 		piece = []
 		piece.append(key) # first column is just the piece number
 		phrases = piece_data_sorted[key]
+		
 		# note that this length is the total number of phrases in the piece,
 		# regardless of how many of those phrases have cadences.
 		# i.e. there may be less than this number of populated columns in the
 		# resulting csv file.
-		length_in_phrases = int(re.search(r'[0-9]+\.([1-9][0-9]?):', phrases[-1][0]).group(1))
+		#length_in_phrases = int(re.search(r'[0-9]+\.([1-9][0-9]?):', phrases[-1][0]).group(1))
+		
+		# this length calculation uses only the number of actual cadences, and will thus match
+		# the number of column entries for each piece.
+		length_in_phrases = len(phrases)
 		
 		fields_to_pair = ["cadence_final_tone", "cadence_kind", "cadence_alter", "cadence_role_cantz", "cadence_role_tenz"]
 		field_indices_to_pair = {headers.index(field)
